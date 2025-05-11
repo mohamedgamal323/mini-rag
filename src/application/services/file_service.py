@@ -7,6 +7,7 @@ from fastapi import UploadFile
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from domain.enums import ProcessingEnum
+from application.services.base_service import BaseService
 from application.services.chunk_service import ChunkService
 from application.services.project_service import ProjectService
 from infrastructure.repositories.mongo_project_repository import MongoProjectRepository
@@ -16,13 +17,14 @@ from application.dtos.response_signal import ResponseSignal
 from helpers.config import get_settings
 
 
-class FileService:
+class FileService(BaseService):
     def __init__(self, db_client):
         self.project_repository = MongoProjectRepository(db_client)
         self.chunk_service = ChunkService(MongoChunkRepository(db_client))
         self.project_service = ProjectService(MongoProjectRepository(db_client))
         self.app_settings = get_settings()
         self.logger = logging.getLogger('uvicorn.error')
+        self.size_scale = 1024 * 1024  # Convert MB to bytes
 
     def validate_uploaded_file(self, file: UploadFile):
 

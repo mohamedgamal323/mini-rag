@@ -15,8 +15,8 @@ class ProjectController(BaseController):
             return ProjectService(repository)
 
         @self.router.post("/", response_model=ProjectResponseDTO)
-        def create_project(dto: CreateProjectDTO, service: ProjectService = Depends(get_project_service)):
-            return service.create_project(dto)
+        async def create_project(dto: CreateProjectDTO, service: ProjectService = Depends(get_project_service)):
+            return await service.create_project(dto)
 
         @self.router.get("/{project_id}", response_model=ProjectResponseDTO)
         def get_project(project_id: str, service: ProjectService = Depends(get_project_service)):
