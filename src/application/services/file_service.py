@@ -77,10 +77,7 @@ class FileService(BaseService):
     async def process_file(
         self, project_id: str, file_id: str, chunk_size: int, overlap_size: int, do_reset: bool
     ) -> int:
-        #validate file properties
-        is_valid, result_signal = self.validate_uploaded_file(file_id)
-        if not is_valid:
-            raise ValueError(result_signal)
+        # Validate file properties (removed as file_id is not an UploadFile)
 
         # Validate project existence
         project = await self.project_repository.get_project(project_id)
@@ -95,10 +92,10 @@ class FileService(BaseService):
         chunks = self.process_file_content(file_content)
         chunk_objects = [
             Chunk(
-                chunk_text=chunk.page_content,
-                chunk_metadata=chunk.metadata,
-                chunk_order=i + 1,
-                chunk_project_id=project_id,
+                content=chunk.page_content,
+                metadata=chunk.metadata,
+                order=i + 1,
+                project_id=project_id,
             )
             for i, chunk in enumerate(chunks)
         ]
