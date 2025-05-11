@@ -1,8 +1,8 @@
-from src.controllers.base_controller import BaseController
+from controllers.base_controller import BaseController
 from fastapi import Depends
-from src.application.services.project_service import ProjectService
-from src.application.dtos.project_dto import CreateProjectDTO, ProjectResponseDTO
-from src.infrastructure.repositories.mongo_project_repository import MongoProjectRepository
+from application.services.project_service import ProjectService
+from application.dtos.project_dto import CreateProjectDTO, ProjectResponseDTO
+from infrastructure.repositories.mongo_project_repository import MongoProjectRepository
 
 class ProjectController(BaseController):
     def __init__(self):

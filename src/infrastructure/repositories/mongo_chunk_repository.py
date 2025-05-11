@@ -1,7 +1,7 @@
 from bson.objectid import ObjectId
 from pymongo import InsertOne
-from src.domain.models.chunk import Chunk
-from src.domain.enums.database_enum import DataBaseEnum
+from domain.models.chunk import Chunk
+from domain.enums.database_enum import DataBaseEnum
 
 class MongoChunkRepository:
     def __init__(self, db_client):

@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
 from controllers.file_controller import FileController
-from src.controllers.project_controller import ProjectController
+from controllers.project_controller import ProjectController
+from controllers.chunk_controller import ChunkController
 
 app = FastAPI()
 

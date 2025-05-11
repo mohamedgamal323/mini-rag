@@ -1,6 +1,6 @@
 from bson.objectid import ObjectId
-from src.domain.models.project import Project
-from src.domain.enums.database_enum import DataBaseEnum
+from domain.models.project import Project
+from domain.enums.database_enum import DataBaseEnum
 
 class MongoProjectRepository:
     def __init__(self, db_client):

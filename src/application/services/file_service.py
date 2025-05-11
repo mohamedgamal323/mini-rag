@@ -1,18 +1,19 @@
 import os
-from fastapi.responses import JSONResponse, status
+from fastapi.responses import JSONResponse
+from fastapi import status
 import aiofiles
 import logging
 from fastapi import UploadFile
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from models.enums import ProcessingEnum
-from src.application.services.chunk_service import ChunkService
-from src.application.services.project_service import ProjectService
-from src.infrastructure.repositories.mongo_project_repository import MongoProjectRepository
-from src.infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
-from src.domain.models.chunk import Chunk
-from src.application.dtos.response_signal import ResponseSignal
-from src.helpers.config import get_settings
+from domain.enums import ProcessingEnum
+from application.services.chunk_service import ChunkService
+from application.services.project_service import ProjectService
+from infrastructure.repositories.mongo_project_repository import MongoProjectRepository
+from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
+from domain.models.chunk import Chunk
+from application.dtos.response_signal import ResponseSignal
+from helpers.config import get_settings
 
 
 class FileService:

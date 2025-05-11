@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile
-from src.controllers.base_controller import BaseController
+from controllers.base_controller import BaseController
 from application.services.file_service import FileService
-from src.application.dtos.process_request_dto import ProcessRequestDTO
+from application.dtos.process_request_dto import ProcessRequestDTO
 
 class FileController(BaseController):
     def __init__(self, db_client):

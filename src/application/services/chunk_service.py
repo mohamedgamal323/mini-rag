@@ -1,6 +1,6 @@
-from src.application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
-from src.domain.models.chunk import Chunk
-from src.infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
+from application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
+from domain.models.chunk import Chunk
+from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
 
 class ChunkService:
     def __init__(self, repository: MongoChunkRepository):

@@ -1,8 +1,8 @@
-from src.controllers.base_controller import BaseController
+from controllers.base_controller import BaseController
 from fastapi import Depends
-from src.application.services.chunk_service import ChunkService
-from src.application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
-from src.infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
+from application.services.chunk_service import ChunkService
+from application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
+from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
 
 class ChunkController(BaseController):
     def __init__(self):
