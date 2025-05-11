@@ -5,7 +5,7 @@ from application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
 from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
 
 class ChunkController(BaseController):
-    def __init__(self):
+    def __init__(self, db_client):
         super().__init__(prefix="/chunks", tags=["chunks"])
 
         # Dependency injection for the service
@@ -22,5 +22,6 @@ class ChunkController(BaseController):
             return service.get_chunk(chunk_id)
 
 # Instantiate the controller and expose its router
-chunk_controller = ChunkController()
-router = chunk_controller.router
+def create_chunk_controller(db_client):
+    chunk_controller = ChunkController(db_client)
+    return chunk_controller.router

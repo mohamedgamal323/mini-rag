@@ -5,8 +5,9 @@ from application.dtos.project_dto import CreateProjectDTO, ProjectResponseDTO
 from infrastructure.repositories.mongo_project_repository import MongoProjectRepository
 
 class ProjectController(BaseController):
-    def __init__(self):
+    def __init__(self, db_client):
         super().__init__(prefix="/projects", tags=["projects"])
+        self.db_client = db_client
 
         # Dependency injection for the service
         def get_project_service() -> ProjectService:
@@ -22,5 +23,6 @@ class ProjectController(BaseController):
             return service.get_project(project_id)
 
 # Instantiate the controller and expose its router
-project_controller = ProjectController()
-router = project_controller.router
+def create_project_controller(db_client):
+    project_controller = ProjectController(db_client)
+    return project_controller.router
