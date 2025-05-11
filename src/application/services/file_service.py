@@ -89,19 +89,26 @@ class FileService(BaseService):
         file_content = self.load_file_content(project_path, file_id)
 
         # Process file content into chunks
-        chunks = self.process_file_content(file_content)
+        chunks = self.process_file_content(file_content, chunk_size, overlap_size)
         chunk_objects = [
             Chunk(
                 content=chunk.page_content,
                 metadata=chunk.metadata,
                 order=i + 1,
                 project_id=project_id,
+                file_id=file_id,
             )
             for i, chunk in enumerate(chunks)
         ]
+        self.logger.info(f"Before checking do reset: {do_reset}")
+        # Check if do_reset is True
+        if do_reset:
+            # Delete existing chunks for the project
+            self.logger.info(f"Deleting existing chunks for file_id: {file_id}")
+            await self.chunk_service.delete_chunks_by_file_id(file_id=file_id)
 
         # Insert chunks into the database
-        return await self.chunk_service.insert_chunks(chunk_objects, do_reset, project_id)
+        return await self.chunk_service.insert_chunks(chunk_objects)
     
     def load_file_content(self, project_path: str, file_id: str) -> list:
         file_ext = os.path.splitext(file_id)[-1]

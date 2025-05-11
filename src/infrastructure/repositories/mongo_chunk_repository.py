@@ -28,8 +28,12 @@ class MongoChunkRepository:
             await self.collection.bulk_write(operations)
         return len(chunks)
 
+    async def delete_chunks_by_file_id(self, file_id: str):
+        result = await self.collection.delete_many({"file_id": file_id})
+        return result.deleted_count
+    
     async def delete_chunks_by_project_id(self, project_id: ObjectId):
-        result = await self.collection.delete_many({"chunk_project_id": project_id})
+        result = await self.collection.delete_many({"project_id": project_id})
         return result.deleted_count
 
     @staticmethod

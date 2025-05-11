@@ -40,14 +40,14 @@ class ChunkService:
             content=chunk.content,
         )
 
-    async def insert_chunks(self, chunks: list[Chunk], do_reset: bool, project_id: str):
-        # Reset chunks if requested
-        if do_reset:
-            await self.repository.delete_chunks_by_project_id(project_id)
-
+    async def insert_chunks(self, chunks: list[Chunk]):
         # Insert chunks into the database
         return await self.repository.insert_many_chunks(chunks)
 
     async def delete_chunks_by_project_id(self, project_id: str):
         # Delete chunks for a specific project
         return await self.repository.delete_chunks_by_project_id(project_id)
+    
+    async def delete_chunks_by_file_id(self, file_id: str):
+        # Delete chunks for a specific file
+        return await self.repository.delete_chunks_by_file_id(file_id)
