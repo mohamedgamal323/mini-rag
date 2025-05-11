@@ -26,9 +26,12 @@ class MongoProjectRepository:
         return project
 
     async def get_project(self, project_id: str):
-        result = await self.collection.find_one({"_id": ObjectId(project_id)})
+        result = await self.collection.find_one({"project_id": project_id})
         if result is None:
             return None
+        # Convert _id to string before returning
+        result["id"] = str(result["_id"])
+        del result["_id"]
         return Project(**result)
 
     async def update_project(self, project_id: str, update_data: dict):

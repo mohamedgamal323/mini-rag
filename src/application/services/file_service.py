@@ -47,7 +47,7 @@ class FileService(BaseService):
                 }
             )
 
-        file_path, file_id = self.generate_unique_filepath(
+        file_path, file_id = await self.generate_unique_filepath(
             orig_file_name=file.filename,
             project_id=project_id
         )
@@ -136,10 +136,10 @@ class FileService(BaseService):
 
         return chunks
     
-    def generate_unique_filepath(self, orig_file_name: str, project_id: str):
+    async def generate_unique_filepath(self, orig_file_name: str, project_id: str):
 
         random_key = self.generate_random_string()
-        project_path = self.project_service.get_project_path(project_id=project_id)
+        project_path = await self.project_service.get_project_path(project_id=project_id)
 
         cleaned_file_name = self.get_clean_file_name(
             orig_file_name=orig_file_name

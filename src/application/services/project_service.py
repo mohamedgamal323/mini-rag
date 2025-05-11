@@ -20,7 +20,7 @@ class ProjectService:
         project = await self.repository.get_project(project_id)
         if not project:
             raise ValueError(f"Project with ID {project_id} not found")
-        return ProjectResponseDTO(id=project.id, project_id=project.project_id)
+        return ProjectResponseDTO(id=str(project.id), project_id=project.project_id)
 
     async def get_project_path(self, project_id: str) -> str:
         # Ensure the project exists
