@@ -9,22 +9,10 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_db_client():
-    settings = get_settings()
-    app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
-    app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
+    app.include_router(FileController().router, prefix="/api/v1")
+    app.include_router(ProjectController().router, prefix="/api/v1")
+    app.include_router(ChunkController().router, prefix="/api/v1")
 
-    # Initialize controllers with the database client
-    app.file_processing_controller = FileController(app.db_client)
-    app.project_controller = ProjectController(app.db_client)
-    app.chunk_controller = ChunkController(app.db_client)
-    # Include routers from controllers
-    app.include_router(app.file_processing_controller.router, prefix="/api/v1")
-    app.include_router(app.project_controller.router, prefix="/api/v1")
-    app.include_router(app.chunk_controller.router, prefix="/api/v1")
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    app.mongo_conn.close()
 
 
 

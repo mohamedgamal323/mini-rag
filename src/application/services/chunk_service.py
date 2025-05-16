@@ -1,9 +1,10 @@
+from fastapi import Depends
 from application.dtos.chunk_dto import CreateChunkDTO, ChunkResponseDTO
 from domain.models.chunk import Chunk
 from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
 
 class ChunkService:
-    def __init__(self, repository: MongoChunkRepository):
+    def __init__(self, repository: MongoChunkRepository = Depends()):
         self.repository = repository
 
     def create_chunk(self, dto: CreateChunkDTO) -> ChunkResponseDTO:

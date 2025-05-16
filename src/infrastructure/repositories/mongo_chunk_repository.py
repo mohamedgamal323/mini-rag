@@ -1,10 +1,12 @@
 from bson.objectid import ObjectId
 from pymongo import InsertOne
+from fastapi import Depends
+from infrastructure.repositories.db_client import get_db_client
 from domain.models.chunk import Chunk
 from domain.enums.database_enum import DataBaseEnum
 
 class MongoChunkRepository:
-    def __init__(self, db_client):
+    def __init__(self, db_client = Depends(get_db_client)):
         self.collection = db_client[DataBaseEnum.COLLECTION_CHUNK_NAME.value]
 
     async def create_chunk(self, chunk: Chunk):
@@ -51,3 +53,7 @@ class MongoChunkRepository:
             chunk_id=data["chunk_id"],
             content=data["content"],
         )
+
+    def create_indexes(self):
+        for index in Chunk.get_indexes():
+            self.collection.create_index(index["keys"], **index.get("options", {}))

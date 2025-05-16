@@ -1,6 +1,7 @@
 import os
 from fastapi.responses import JSONResponse
 from fastapi import status
+from fastapi import Depends
 import aiofiles
 import logging
 from fastapi import UploadFile
@@ -18,10 +19,13 @@ from helpers.config import get_settings
 
 
 class FileService(BaseService):
-    def __init__(self, db_client):
-        self.project_repository = MongoProjectRepository(db_client)
-        self.chunk_service = ChunkService(MongoChunkRepository(db_client))
-        self.project_service = ProjectService(MongoProjectRepository(db_client))
+    def __init__(self, project_repository: MongoProjectRepository = Depends(), 
+                 chunk_service : ChunkService = Depends(),
+                 project_service: ProjectService = Depends()):
+        super().__init__()
+        self.project_repository = project_repository
+        self.chunk_service = chunk_service
+        self.project_service = project_service
         self.app_settings = get_settings()
         self.logger = logging.getLogger('uvicorn.error')
         self.size_scale = 1024 * 1024  # Convert MB to bytes

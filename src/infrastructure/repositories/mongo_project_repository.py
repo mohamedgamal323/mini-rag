@@ -1,9 +1,11 @@
 from bson.objectid import ObjectId
+from fastapi import Depends
+from infrastructure.repositories.db_client import get_db_client
 from domain.models.project import Project
 from domain.enums.database_enum import DataBaseEnum
 
 class MongoProjectRepository:
-    def __init__(self, db_client):
+    def __init__(self, db_client = Depends(get_db_client)):
         self.collection = db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
 
     @staticmethod
@@ -44,3 +46,7 @@ class MongoProjectRepository:
     async def delete_project(self, project_id: str):
         result = await self.collection.delete_one({"_id": ObjectId(project_id)})
         return result.deleted_count
+
+    def create_indexes(self):
+        for index in Project.get_indexes():
+            self.collection.create_index(index["keys"], **index.get("options", {}))

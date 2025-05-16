@@ -1,11 +1,12 @@
 import os
+from fastapi import Depends
 from helpers.config import get_settings
 from domain.models.project import Project
 from application.dtos.project_dto import CreateProjectDTO, ProjectResponseDTO
 from infrastructure.repositories.mongo_project_repository import MongoProjectRepository
 
 class ProjectService:
-    def __init__(self, repository: MongoProjectRepository):
+    def __init__(self, repository: MongoProjectRepository = Depends()):
         self.repository = repository
         self.settings = get_settings()
 
