@@ -13,6 +13,7 @@ from domain.enums.asset_type_enum import AssetType
 from domain.models.chunk import Chunk
 from application.services.base_service import BaseService
 import logging 
+import re   
 
 class AssetService(BaseService):
     def __init__(
@@ -22,13 +23,15 @@ class AssetService(BaseService):
     ):
         self.asset_repository = asset_repository
         self.chunk_repository = chunk_repository
+        self.logger = logging.getLogger('uvicorn.error')
 
     async def upload_file_asset(self, project_id: str, file: UploadFile):
         logging.info("Before reading file content")
         content = await file.read()
         logging.info("After reading file content")
         asset = Asset(
-            asset_id=self.generate_random_string() + file.filename,  # You may want to generate a unique ID
+            asset_id=self.generate_random_string() + self.get_clean_asset_name(file.filename),  # You may want to generate a unique ID
+            asset_name=self.get_clean_asset_name(file.filename),
             project_id=project_id,
             type=AssetType.FILE,
             source=file.filename,
@@ -51,18 +54,22 @@ class AssetService(BaseService):
         if asset.type == AssetType.FILE:
             file_handler = FileAssetHandler()
             chunks = file_handler.process(asset, process_all_request.chunk_size, process_all_request.overlap_size)
+            self.logger.info(f"Chunks generated: {len(chunks)}")
+            self.logger.info(f"Chunks: {chunks[0]}")
+            self.logger.info(f"Chunk content: {chunks[0]['content']}")
             if chunks:
             # Map the returned chunks to Chunk model before inserting into the repository
                 chunk_objects = [
                     Chunk(
-                        content=chunk,
-                        metadata=asset.metadata,
-                        order=chunk.chunk_order,
+                        content=chunk["content"],
+                        metadata=chunk["metadata"],
+                        order=chunk["chunk_order"],
                         project_id=project_id,
-                        asset_id=chunk.asset_id,
+                        asset_id=asset_id,
                     )
                     for i, chunk in enumerate(chunks)
                 ]
+                self.logger.info(f"Chunk objects: {chunk_objects[0]}")
                 await self.chunk_repository.insert_many_chunks(chunk_objects)
                 await self.asset_repository.mark_asset_processed(asset_id)
             return {"asset_id": asset_id, "chunks_count": len(chunks)}
@@ -76,3 +83,13 @@ class AssetService(BaseService):
                 result = await self.process_asset(asset.asset_id, project_id, process_all_request)
                 results.append(result)
         return results
+    
+    def get_clean_asset_name(self, orig_asset_name: str):
+
+        # remove any special characters, except underscore and .
+        cleaned_asset_name = re.sub(r'[^\w.]', '', orig_asset_name.strip())
+
+        # replace spaces with underscore
+        cleaned_asset_name = cleaned_asset_name.replace(" ", "_")
+
+        return cleaned_asset_name

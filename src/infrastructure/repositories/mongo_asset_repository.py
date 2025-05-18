@@ -2,10 +2,17 @@ from fastapi import Depends
 from infrastructure.repositories.db_client import get_db_client
 from domain.models.asset import Asset
 from domain.enums.asset_type_enum import AssetType
+from domain.enums.database_enum import DataBaseEnum
 
 class MongoAssetRepository:
     def __init__(self, db_client=Depends(get_db_client)):
-        self.collection = db_client["assets"]
+        self.collection = db_client[DataBaseEnum.COLLECTION_ASSET_NAME.value]
+        # existing_collections = await db_client.list_collection_names()
+        # if DataBaseEnum.COLLECTION_ASSET_NAME.value not in existing_collections:
+        #     # Get indexes from the Asset class
+        #     indexes = Asset.get_indexes()
+        #     for index in indexes:
+        #     self.collection.create_index(index["fields"], **index["options"])
 
     async def create_asset(self, asset: Asset):
         result = await self.collection.insert_one(asset.dict(by_alias=True, exclude_unset=True))
