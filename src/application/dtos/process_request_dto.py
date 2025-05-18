@@ -5,3 +5,9 @@ class ProcessRequestDTO(BaseModel):
     chunk_size: int
     overlap_size: int
     do_reset: bool
+
+class ProcessAllRequestDTO(BaseModel):
+    project_id: str
+    chunk_size: int
+    overlap_size: int
+    do_reset: bool

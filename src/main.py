@@ -4,6 +4,7 @@ from helpers.config import get_settings
 from controllers.file_controller import FileController
 from controllers.project_controller import ProjectController
 from controllers.chunk_controller import ChunkController
+from controllers.asset_controller import AssetController
 
 app = FastAPI()
 
@@ -12,6 +13,7 @@ async def startup_db_client():
     app.include_router(FileController().router, prefix="/api/v1")
     app.include_router(ProjectController().router, prefix="/api/v1")
     app.include_router(ChunkController().router, prefix="/api/v1")
+    app.include_router(AssetController().router, prefix="/api/v1")
 
 
 
