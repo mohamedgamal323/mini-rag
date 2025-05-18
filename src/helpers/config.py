@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import BaseSettings as PydanticBaseSettings
 import os
 
 class Settings(BaseSettings):
@@ -16,3 +17,17 @@ class Settings(BaseSettings):
 
 def get_settings():
     return Settings()
+
+class LLMConfig(PydanticBaseSettings):
+    openai_api_key: str
+    openai_generation_model: str = "gpt-3.5-turbo"
+    openai_embedding_model: str = "text-embedding-ada-002"
+
+    cohere_api_key: str
+    cohere_generation_model: str = "command"
+    cohere_embedding_model: str = "embed-english-v3.0"
+
+    class Config:
+        env_file = ".env"
+
+llm_config = LLMConfig()
