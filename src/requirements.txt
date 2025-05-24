@@ -12,3 +12,4 @@ pymongo==4.5.0
 pydantic-settings==2.2.1
 openai>=1.0.0
 cohere>=4.0.0
+qdrant-client>=1.10.0

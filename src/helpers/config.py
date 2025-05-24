@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from pydantic import BaseSettings as PydanticBaseSettings
+from pydantic import Extra
 import os
 
 class Settings(BaseSettings):
@@ -14,20 +14,35 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = Extra.allow
 
 def get_settings():
     return Settings()
 
-class LLMConfig(PydanticBaseSettings):
-    openai_api_key: str
-    openai_generation_model: str = "gpt-3.5-turbo"
-    openai_embedding_model: str = "text-embedding-ada-002"
+class LLMConfig(BaseSettings):
+    OPENAI_API_KEY: str
+    OPENAI_GENERATION_MODEL: str = "gpt-3.5-turbo"
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-ada-002"
 
-    cohere_api_key: str
-    cohere_generation_model: str = "command"
-    cohere_embedding_model: str = "embed-english-v3.0"
+    COHERE_API_KEY: str
+    COHERE_GENERATION_MODEL: str = "command"
+    COHERE_EMBEDDING_MODEL: str = "embed-english-v3.0"
 
     class Config:
         env_file = ".env"
+        extra = Extra.allow
 
 llm_config = LLMConfig()
+
+class VectorDBConfig(BaseSettings):
+    QDRANT_HOST: str = "localhost"
+    QDRANT_PORT: int = 6333
+    QDRANT_API_KEY: str = ""
+    QDRANT_VECTOR_SIZE: int = 768
+    QDRANT_DISTANCE: str = "Cosine"
+
+    class Config:
+        env_file = ".env"
+        extra = Extra.allow
+
+vector_db_config = VectorDBConfig()

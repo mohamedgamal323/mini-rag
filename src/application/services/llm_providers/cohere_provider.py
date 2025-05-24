@@ -5,7 +5,7 @@ import cohere
 class CoHereProvider(LLMProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.client = cohere.Client(self.llm_config.cohere_api_key)
+        self.client = cohere.Client(self.llm_config.COHERE_API_KEY)
 
     def set_generation_model(self, model_name: str):
         self.generation_model = model_name
@@ -17,7 +17,7 @@ class CoHereProvider(LLMProvider):
         self._validate_input(prompt)
         self._validate_tokens(max_tokens)
         response = self.client.generate(
-            model=self.generation_model or self.llm_config.cohere_generation_model,
+            model=self.generation_model or self.llm_config.COHERE_GENERATION_MODEL,
             prompt=prompt,
             max_tokens=max_tokens,
         )
@@ -26,7 +26,7 @@ class CoHereProvider(LLMProvider):
     async def embed(self, text: str) -> list[float]:
         self._validate_input(text)
         response = self.client.embed(
-            model=self.embedding_model or self.llm_config.cohere_embedding_model,
+            model=self.embedding_model or self.llm_config.COHERE_EMBEDDING_MODEL,
             texts=[text],
         )
         return response.embeddings[0]
@@ -35,7 +35,7 @@ class CoHereProvider(LLMProvider):
         for text in texts:
             self._validate_input(text)
         response = self.client.embed(
-            model=self.embedding_model or self.llm_config.cohere_embedding_model,
+            model=self.embedding_model or self.llm_config.COHERE_EMBEDDING_MODEL,
             texts=texts,
         )
         return response.embeddings
