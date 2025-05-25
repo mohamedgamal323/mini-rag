@@ -1,9 +1,9 @@
 from fastapi import UploadFile, Depends
 from fastapi.responses import JSONResponse
-
 from typing import List, Optional
 from domain.enums.asset_type_enum import AssetType
 from domain.models.asset import Asset
+from domain.enums.llm_provider_enum import LLMProviderEnum
 from infrastructure.repositories.mongo_asset_repository import MongoAssetRepository
 from infrastructure.repositories.mongo_chunk_repository import MongoChunkRepository
 from application.dtos.asset_dto import CreateAssetDTO
@@ -12,6 +12,9 @@ from .asset_handlers.file_asset_handler import FileAssetHandler
 from domain.enums.asset_type_enum import AssetType
 from domain.models.chunk import Chunk
 from application.services.base_service import BaseService
+from application.services.llm_providers.llm_provider_factory import LLMProviderFactory
+from application.services.vector_db_providers.vector_db_factory import VectorDBFactory
+from domain.enums.vector_db_provider_enum import VectorDBProviderEnum
 import logging 
 import re   
 
@@ -56,9 +59,8 @@ class AssetService(BaseService):
             chunks = file_handler.process(asset, process_all_request.chunk_size, process_all_request.overlap_size)
             self.logger.info(f"Chunks generated: {len(chunks)}")
             self.logger.info(f"Chunks: {chunks[0]}")
-            self.logger.info(f"Chunk content: {chunks[0]['content']}")
             if chunks:
-            # Map the returned chunks to Chunk model before inserting into the repository
+                # 1. Batch save chunk into MongoDB
                 chunk_objects = [
                     Chunk(
                         content=chunk["content"],
@@ -69,8 +71,27 @@ class AssetService(BaseService):
                     )
                     for i, chunk in enumerate(chunks)
                 ]
-                self.logger.info(f"Chunk objects: {chunk_objects[0]}")
                 await self.chunk_repository.insert_many_chunks(chunk_objects)
+
+                # 2. Batch embed chunk texts
+                llm = LLMProviderFactory.create(LLMProviderEnum.OPENAI)
+                chunk_texts = [chunk["content"] for chunk in chunks]
+                embeddings = await llm.batch_embed(chunk_texts)
+
+                # 3. Push embeddings and metadata to VectorDB
+                vector_db = VectorDBFactory.create(VectorDBProviderEnum.QDRANT)
+                vector_points = [
+                    {
+                        "chunk_id": chunk["chunk_id"],
+                        "asset_id": chunk["asset_id"],
+                        "project_id": project_id,
+                        "order": chunk.get("chunk_order", idx),
+                        "embedding": embeddings[idx],
+                    }
+                    for idx, chunk in enumerate(chunks)
+                ]
+                vector_db.add_embeddings("chunks", vector_points)
+
                 await self.asset_repository.mark_asset_processed(asset_id)
             return {"asset_id": asset_id, "chunks_count": len(chunks)}
         return None

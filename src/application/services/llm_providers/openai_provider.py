@@ -1,11 +1,14 @@
 from typing import List
 from .llm_provider import LLMProvider
-import openai
-
+from openai import OpenAI
+import logging
 class OpenAIProvider(LLMProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        openai.api_key = self.llm_config.OPENAI_API_KEY
+        self.client = OpenAI(
+            api_key=self.llm_config.OPENAI_API_KEY
+        )
+        self.logger = logging.getLogger('uvicorn.error')
 
     def set_generation_model(self, model_name: str):
         self.generation_model = model_name
@@ -16,7 +19,7 @@ class OpenAIProvider(LLMProvider):
     async def generate_text(self, prompt: str, max_tokens: int = 128) -> str:
         self._validate_input(prompt)
         self._validate_tokens(max_tokens)
-        response = openai.ChatCompletion.create(
+        response = self.client.ChatCompletion.create(
             model=self.generation_model or self.llm_config.OPENAI_GENERATION_MODEL,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=max_tokens,
@@ -25,7 +28,7 @@ class OpenAIProvider(LLMProvider):
 
     async def embed(self, text: str) -> list[float]:
         self._validate_input(text)
-        response = openai.Embedding.create(
+        response = self.client.embeddings.create(
             model=self.embedding_model or self.llm_config.OPENAI_EMBEDDING_MODEL,
             input=text,
         )
@@ -34,8 +37,8 @@ class OpenAIProvider(LLMProvider):
     async def batch_embed(self, texts: List[str]) -> List[List[float]]:
         for text in texts:
             self._validate_input(text)
-        response = openai.Embedding.create(
+        response = self.client.embeddings.create(
             model=self.embedding_model or self.llm_config.OPENAI_EMBEDDING_MODEL,
             input=texts,
         )
-        return [item["embedding"] for item in response["data"]]
+        return [item.embedding for item in response.data]

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from helpers.llm_config import llm_config
+from helpers.config import llm_config
 
 class LLMProvider(ABC):
     def __init__(self, *args, **kwargs):

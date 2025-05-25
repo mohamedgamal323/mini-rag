@@ -1,5 +1,6 @@
 from domain.models.asset import Asset
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import uuid
 
 class FileAssetHandler:
 
@@ -19,6 +20,7 @@ class FileAssetHandler:
         chunks = splitter.split_text(content_str)
         return [
             {
+                "chunk_id": uuid.uuid4().hex,  # Generate a unique chunk_id
                 "project_id": asset.project_id,
                 "asset_id": asset.asset_id,
                 "content": chunk,
